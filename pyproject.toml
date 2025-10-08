@@ -1,0 +1,18 @@
+[project]
+name = "artgallery-wallpaper"
+version = "0.0.1"
+description = "A python application that generates framed wallpapers from artwork"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = []
+authors = [
+    {name = "Tahmidul Islam", email = "me@tahmidul612.com"},
+]
+license = "MIT"
+classifiers = [
+    "Programming Language :: Python :: 3.14",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+[project.urls]
+Homepage = "https://github.com/tahmidul612/artgallery-wallpaper"
