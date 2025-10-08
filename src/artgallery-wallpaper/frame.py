@@ -111,16 +111,16 @@ def remove_background(
 
 
 # if __name__ == "__main__":
-# # Example usage for a single, difficult image:
-# remove_background(
-#     image_path="../../assets/frames",
-#     saturation_threshold=50,
-#     open_kernel_size=5,
-#     close_kernel_size=16,
-# )
+#     # Example usage for a single, difficult image:
+#     remove_background(
+#         image_path="../../assets/frames",
+#         saturation_threshold=50,
+#         open_kernel_size=5,
+#         close_kernel_size=16,
+#     )
 
-# # Example usage for a directory of images:
-# remove_background(
-#     image_path="../../assets/frames/",
-#     output_path="../../assets/frames/processed/"
-# )
+#     # Example usage for a directory of images:
+#     remove_background(
+#         image_path="../../assets/frames/",
+#         output_path="../../assets/frames/processed/"
+#     )
