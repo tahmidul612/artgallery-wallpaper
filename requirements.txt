@@ -51,6 +51,18 @@ colorama==0.4.6 ; sys_platform == 'win32' \
     --hash=sha256:08695f5cb7ed6e0531a20572697297273c47b8cae5a63ffc6d6ed5c201be6e44 \
     --hash=sha256:4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6
     # via tqdm
+coloredlogs==15.0.1 \
+    --hash=sha256:612ee75c546f53e92e70049c9dbfcc18c935a2b9a53b66085ce9ef6a6e5c0934 \
+    --hash=sha256:7c991aa71a4577af2f82600d8f8f3a89f936baeaf9b50a9c197da014e5bf16b0
+    # via onnxruntime
+flatbuffers==25.9.23 \
+    --hash=sha256:255538574d6cb6d0a79a17ec8bc0d30985913b87513a01cce8bcdb6b4c44d0e2 \
+    --hash=sha256:676f9fa62750bb50cf531b42a0a2a118ad8f7f797a511eda12881c016f093b12
+    # via onnxruntime
+humanfriendly==10.0 \
+    --hash=sha256:1697e1a8a8f550fd43c2865cd84542fc175a61dcb779b6fee18cf6b6ccba1477 \
+    --hash=sha256:6b0b831ce8f15f7300721aa49829fc4e83921a9a301cc7f606be6686a2288ddc
+    # via coloredlogs
 idna==3.10 \
     --hash=sha256:12f65c9b470abda6dc35cf8e63cc574b1c52b11df2c86030af0ac09b01b13ea9 \
     --hash=sha256:946d195a0d259cbba61165e88e65941f16e9b36ea6ddb97f00452bae8b1287d3
@@ -102,6 +114,10 @@ llvmlite==0.45.1 ; python_full_version >= '3.10' \
     --hash=sha256:f7319e5f9f90720578a7f56fbc805bdfb4bc071b507c7611f170d631c3c0f1e0 \
     --hash=sha256:f9c272682d91e0d57f2a76c6d9ebdfccc603a01828cdbe3d15273bdca0c3363a
     # via numba
+mpmath==1.3.0 \
+    --hash=sha256:7a28eb2a9774d00c7bc92411c19a89209d5da7c4c9a9e227be8330a23a25b91f \
+    --hash=sha256:a0b2b9fe80bbcd81a6647ff13108738cfb482d481d826cc0e02f5b35e5c88d2c
+    # via sympy
 networkx==3.2.1 ; python_full_version < '3.10' \
     --hash=sha256:9f1bb5cf3409bf324e0a722c20bdb4c20ee39bf1c30ce8ae499c8502b0b5e0c6 \
     --hash=sha256:f18c69adc97877c42332c170849c96cefa91881c99a7cb3e95b7c659ebdc1ec2
@@ -184,6 +200,7 @@ numpy==2.0.2 ; python_full_version < '3.10' \
     # via
     #   imageio
     #   numba
+    #   onnxruntime
     #   opencv-python-headless
     #   pymatting
     #   rembg
@@ -219,6 +236,7 @@ numpy==2.2.6 ; python_full_version == '3.10.*' \
     # via
     #   imageio
     #   numba
+    #   onnxruntime
     #   opencv-python-headless
     #   pymatting
     #   rembg
@@ -248,12 +266,37 @@ numpy==2.3.3 ; python_full_version >= '3.11' \
     # via
     #   imageio
     #   numba
+    #   onnxruntime
     #   opencv-python-headless
     #   pymatting
     #   rembg
     #   scikit-image
     #   scipy
     #   tifffile
+onnxruntime==1.20.1 ; python_full_version < '3.10' \
+    --hash=sha256:06bfbf02ca9ab5f28946e0f912a562a5f005301d0c419283dc57b3ed7969bb7b \
+    --hash=sha256:4c4b251a725a3b8cf2aab284f7d940c26094ecd9d442f07dd81ab5470e99b83f \
+    --hash=sha256:5eec64c0269dcdb8d9a9a53dc4d64f87b9e0c19801d9321246a53b7eb5a7d1bc \
+    --hash=sha256:7b2908b50101a19e99c4d4e97ebb9905561daf61829403061c1adc1b588bc0de \
+    --hash=sha256:8508887eb1c5f9537a4071768723ec7c30c28eb2518a00d0adcd32c89dea3221 \
+    --hash=sha256:a19bc6e8c70e2485a1725b3d517a2319603acc14c1f1a017dda0afe6d4665b41 \
+    --hash=sha256:d3b616bb53a77a9463707bb313637223380fc327f5064c9a782e8ec69c22e6a2 \
+    --hash=sha256:d82daaec24045a2e87598b8ac2b417b1cce623244e80e663882e9fe1aae86410 \
+    --hash=sha256:e50ba5ff7fed4f7d9253a6baf801ca2883cc08491f9d32d78a80da57256a5439 \
+    --hash=sha256:f6243e34d74423bdd1edf0ae9596dd61023b260f546ee17d701723915f06a9f7
+    # via artgallery-wallpaper
+onnxruntime==1.23.1 ; python_full_version >= '3.10' \
+    --hash=sha256:04e54ed9f972aadfe41abbf539cab714fe719aba011db6403e2f0098a282bf38 \
+    --hash=sha256:0b99b96743322ed43c7825d339ad7b0fcb840b85b2e3047536ec1112afefdc41 \
+    --hash=sha256:1b89fd116f20b70e1140a77286954a7715eb9347260ff2008ee7ec94994df039 \
+    --hash=sha256:61139a29d536b71db6045c75462e593a53feecc19756dc222531971cd08e5efe \
+    --hash=sha256:6b5257157d319abc87aa17294a9acf17119c6ecfdf9531017239b9022334f9b7 \
+    --hash=sha256:740f8b32903a28d96eb70ad5d2ec586443768018b3e1211db986d6fa9b4d0ca1 \
+    --hash=sha256:7973186e8eb66e32ea20cb238ae92b604091e4d1df632653ec830abf7584d0b3 \
+    --hash=sha256:7f130f4b0d31ba17c8789053a641958d0d341d96a1bff578d613fb52ded218c2 \
+    --hash=sha256:9ba6e52fb7bc2758a61d1e421d060cf71d5e4259f95ea8a6f72320ae4415f229 \
+    --hash=sha256:cbb28e658dcb60643b56b6ba0b60b03b92004eb9a5e4460471009a5dc16c7d8e
+    # via artgallery-wallpaper
 opencv-python-headless==4.11.0.86 \
     --hash=sha256:0e0a27c19dd1f40ddff94976cfe43066fbbe9dfbb2ec1907d66c19caef42a57b \
     --hash=sha256:48128188ade4a7e517237c8e1e11a9cdf5c282761473383e77beb875bb1e61ca \
@@ -268,6 +311,7 @@ packaging==25.0 \
     --hash=sha256:d443872c98d677bf60f6a1f2f8c1cb748e8fe762d2bf9d3148b5599295b0fc4f
     # via
     #   lazy-loader
+    #   onnxruntime
     #   pooch
     #   scikit-image
 pillow==11.3.0 \
@@ -333,10 +377,25 @@ pooch==1.8.2 \
     --hash=sha256:3529a57096f7198778a5ceefd5ac3ef0e4d06a6ddaf9fc2d609b806f25302c47 \
     --hash=sha256:76561f0de68a01da4df6af38e9955c4c9d1a5c90da73f7e40276a5728ec83d10
     # via rembg
+protobuf==6.32.1 \
+    --hash=sha256:2601b779fc7d32a866c6b4404f9d42a3f67c5b9f3f15b4db3cccabe06b95c346 \
+    --hash=sha256:2f5b80a49e1eb7b86d85fcd23fe92df154b9730a725c3b38c4e43b9d77018bf4 \
+    --hash=sha256:68ff170bac18c8178f130d1ccb94700cf72852298e016a2443bdb9502279e5f1 \
+    --hash=sha256:a8a32a84bc9f2aad712041b8b366190f71dde248926da517bde9e832e4412085 \
+    --hash=sha256:b00a7d8c25fa471f16bc8153d0e53d6c9e827f0953f3c09aaa4331c718cae5e1 \
+    --hash=sha256:b1864818300c297265c83a4982fd3169f97122c299f56a56e2445c3698d34710 \
+    --hash=sha256:d0975d0b2f3e6957111aa3935d08a0eb7e006b1505d825f862a1fffc8348e122 \
+    --hash=sha256:d8c7e6eb619ffdf105ee4ab76af5a68b60a9d0f66da3ea12d1640e6d8dab7281 \
+    --hash=sha256:ee2469e4a021474ab9baafea6cd070e5bf27c7d29433504ddea1a4ee5850f68d
+    # via onnxruntime
 pymatting==1.1.14 \
     --hash=sha256:62ecb81c6caaf6ced7442d3d0864b8f0a3f9e7a95dfb4f8b672e3526f902d9b3 \
     --hash=sha256:75e2ec1e346dbd564c9a2cc8229b134ec939f49008fa570025db30003d0c46fc
     # via rembg
+pyreadline3==3.5.4 ; sys_platform == 'win32' \
+    --hash=sha256:8d57d53039a1c75adba8e50dd3d992b28143480816187ea5efbd5c78e6c885b7 \
+    --hash=sha256:eaf8e6cc3c49bcccf145fc6067ba8643d1df34d604a1ec0eccbf7a18e6d3fae6
+    # via humanfriendly
 referencing==0.36.2 \
     --hash=sha256:df2e89862cd09deabbdba16944cc3f10feb6b3e6f18e902f7cc25609a34775aa \
     --hash=sha256:e8699adbbf8b5c7de96d8ffa0eb5c158b3beafce084968e2ea8bb08c6794dcd0
@@ -536,6 +595,10 @@ scipy==1.16.2 ; python_full_version >= '3.11' \
     #   pymatting
     #   rembg
     #   scikit-image
+sympy==1.14.0 \
+    --hash=sha256:d3d3fe8df1e5a0b42f0e7bdf50541697dbe7d23746e894990c030e2b05e72517 \
+    --hash=sha256:e091cc3e99d2141a0ba2847328f5479b05d94a6635cb96148ccb3f34671bd8f5
+    # via onnxruntime
 tifffile==2024.8.30 ; python_full_version < '3.10' \
     --hash=sha256:2c9508fe768962e30f87def61819183fb07692c258cb175b3c114828368485a4 \
     --hash=sha256:8bc59a8f02a2665cd50a910ec64961c5373bee0b8850ec89d3b7b485bf7be7ad
