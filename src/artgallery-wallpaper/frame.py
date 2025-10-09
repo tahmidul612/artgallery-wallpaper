@@ -107,7 +107,13 @@ def create_mask_and_control(
     mask = Image.fromarray(mask_np)
 
     # Keep full canvas visible for ControlNet structural guidance
-    control_image = canvas.convert("RGB")
+    # Composite on neutral gray background for better AI generation
+    if canvas.mode == "RGBA":
+        control_bg = Image.new("RGB", canvas.size, (128, 128, 128))
+        control_bg.paste(canvas, (0, 0), canvas)
+        control_image = control_bg
+    else:
+        control_image = canvas.convert("RGB")
 
     return mask, control_image
 
@@ -163,16 +169,19 @@ def generate_frame_sd15(
     if not corner_path.exists():
         raise FileNotFoundError(f"Corner image not found: {corner_path}")
 
-    # Set up prompts with defaults
+    # Set up prompts with defaults - emphasize pattern continuation
     if prompt is None:
         prompt = (
-            "ornate gilded wood frame, intricate baroque carvings, detailed texture, "
-            "high-resolution photography, aged patina, museum quality, antique frame"
+            "ornate gilded baroque picture frame, intricate wood carvings continuing seamlessly, "
+            "detailed golden ornamental patterns extending from corner, museum quality antique frame, "
+            "elaborate decorative molding, carved floral motifs, symmetrical ornate design, "
+            "aged patina, high detail photography, professional lighting"
         )
     if negative_prompt is None:
         negative_prompt = (
-            "painting, portrait, picture inside frame, modern, minimalist, blurry, "
-            "low-resolution, text, signature, watermark, content, image"
+            "painting, portrait, artwork, picture content, modern frame, minimalist, plain, simple, "
+            "blurry, low-resolution, text, signature, watermark, smooth, flat, "
+            "gray background, empty space, incomplete pattern"
         )
 
     print(f"[cyan]Loading models for device: {device}[/cyan]")
@@ -393,8 +402,9 @@ def generate_frame_sd15(
         print("[yellow]Generating full top-left quadrant...[/yellow]")
 
         # Create mask for everything except the corner
-        quadrant_width = (width // 2) + 4  # Add small overlap
-        quadrant_height = (height // 2) + 4
+        # Add small overlap and ensure divisible by 8 for SD model
+        quadrant_width = ((width // 2 + 4 + 7) // 8) * 8
+        quadrant_height = ((height // 2 + 4 + 7) // 8) * 8
 
         # Create a quadrant canvas
         quadrant_canvas = Image.new(
@@ -409,8 +419,16 @@ def generate_frame_sd15(
         mask_draw = ImageDraw.Draw(quadrant_mask)
         mask_draw.rectangle([(0, 0), (corner_w, corner_h)], fill=0)
 
-        # Create control image - keep corner visible for ControlNet structural guidance
-        quadrant_control = quadrant_canvas.convert("RGB")
+        # Create control image - composite on neutral gray to help AI understand frame context
+        control_bg = Image.new(
+            "RGB", (quadrant_width, quadrant_height), (128, 128, 128)
+        )
+        control_bg.paste(
+            quadrant_canvas,
+            (0, 0),
+            quadrant_canvas if quadrant_canvas.mode == "RGBA" else None,
+        )
+        quadrant_control = control_bg
 
         # Adjust for memory if needed
         gen_q_width = quadrant_width
@@ -436,19 +454,37 @@ def generate_frame_sd15(
             if device == "cuda":
                 torch.cuda.empty_cache()
 
+            # Create image with neutral gray background for inpainting (helps AI generate textures)
+            image_bg = Image.new("RGB", (gen_q_width, gen_q_height), (128, 128, 128))
+            if gen_q_width == quadrant_width and gen_q_height == quadrant_height:
+                image_bg.paste(
+                    quadrant_canvas,
+                    (0, 0),
+                    quadrant_canvas if quadrant_canvas.mode == "RGBA" else None,
+                )
+            else:
+                # Canvas was already resized above
+                image_bg.paste(
+                    quadrant_canvas,
+                    (0, 0),
+                    quadrant_canvas if quadrant_canvas.mode == "RGBA" else None,
+                )
+
             with torch.no_grad():
                 if device == "cuda" and low_memory:
                     with torch.autocast(device_type="cuda", dtype=torch.float16):
                         result = pipe(
                             prompt=prompt,
                             negative_prompt=negative_prompt,
-                            image=quadrant_canvas.convert("RGB"),
+                            image=image_bg,
                             mask_image=quadrant_mask,
                             control_image=quadrant_control,
                             num_inference_steps=num_inference_steps,
                             generator=generator,
-                            guidance_scale=7.5,
-                            controlnet_conditioning_scale=1.0,
+                            guidance_scale=12.0,  # Higher guidance for better pattern following
+                            controlnet_conditioning_scale=0.5,  # Lower to allow creative generation
+                            control_guidance_end=0.5,  # Stop ControlNet guidance halfway through
+                            strength=0.99,  # Maximum creativity in masked area
                             width=gen_q_width,
                             height=gen_q_height,
                         ).images[0]
@@ -456,13 +492,15 @@ def generate_frame_sd15(
                     result = pipe(
                         prompt=prompt,
                         negative_prompt=negative_prompt,
-                        image=quadrant_canvas.convert("RGB"),
+                        image=image_bg,
                         mask_image=quadrant_mask,
                         control_image=quadrant_control,
                         num_inference_steps=num_inference_steps,
                         generator=generator,
-                        guidance_scale=7.5,
-                        controlnet_conditioning_scale=1.0,
+                        guidance_scale=12.0,  # Higher guidance for better pattern following
+                        controlnet_conditioning_scale=0.5,  # Lower to allow creative generation
+                        control_guidance_end=0.5,  # Stop ControlNet guidance halfway through
+                        strength=0.99,  # Maximum creativity in masked area
                         width=gen_q_width,
                         height=gen_q_height,
                     ).images[0]
@@ -532,6 +570,15 @@ def generate_frame_sd15(
             if device == "cuda":
                 torch.cuda.empty_cache()
 
+            # Create image with neutral gray background for inpainting
+            if gen_canvas.mode == "RGBA":
+                gen_image_bg = Image.new(
+                    "RGB", (gen_width, gen_height), (128, 128, 128)
+                )
+                gen_image_bg.paste(gen_canvas, (0, 0), gen_canvas)
+            else:
+                gen_image_bg = gen_canvas.convert("RGB")
+
             with torch.no_grad():
                 if device == "cuda" and low_memory:
                     # Use autocast for additional memory savings
@@ -539,13 +586,15 @@ def generate_frame_sd15(
                         result_top = pipe(
                             prompt=prompt,
                             negative_prompt=negative_prompt,
-                            image=gen_canvas.convert("RGB"),
+                            image=gen_image_bg,
                             mask_image=gen_top_mask,
                             control_image=gen_top_control,
                             num_inference_steps=num_inference_steps,
                             generator=generator,
-                            guidance_scale=7.5,
-                            controlnet_conditioning_scale=1.0,
+                            guidance_scale=12.0,
+                            controlnet_conditioning_scale=0.5,
+                            control_guidance_end=0.5,
+                            strength=0.99,
                             width=gen_width,
                             height=gen_height,
                         ).images[0]
@@ -553,13 +602,15 @@ def generate_frame_sd15(
                     result_top = pipe(
                         prompt=prompt,
                         negative_prompt=negative_prompt,
-                        image=gen_canvas.convert("RGB"),
+                        image=gen_image_bg,
                         mask_image=gen_top_mask,
                         control_image=gen_top_control,
                         num_inference_steps=num_inference_steps,
                         generator=generator,
-                        guidance_scale=7.5,
-                        controlnet_conditioning_scale=1.0,
+                        guidance_scale=12.0,
+                        controlnet_conditioning_scale=0.5,
+                        control_guidance_end=0.5,
+                        strength=0.99,
                         width=gen_width,
                         height=gen_height,
                     ).images[0]
@@ -622,19 +673,30 @@ def generate_frame_sd15(
             if device == "cuda":
                 torch.cuda.empty_cache()
 
+            # Create image with neutral gray background for inpainting
+            if gen_canvas.mode == "RGBA":
+                gen_image_bg_left = Image.new(
+                    "RGB", (gen_width, gen_height), (128, 128, 128)
+                )
+                gen_image_bg_left.paste(gen_canvas, (0, 0), gen_canvas)
+            else:
+                gen_image_bg_left = gen_canvas.convert("RGB")
+
             with torch.no_grad():
                 if device == "cuda" and low_memory:
                     with torch.autocast(device_type="cuda", dtype=torch.float16):
                         result_left = pipe(
                             prompt=prompt,
                             negative_prompt=negative_prompt,
-                            image=gen_canvas.convert("RGB"),
+                            image=gen_image_bg_left,
                             mask_image=gen_left_mask,
                             control_image=gen_left_control,
                             num_inference_steps=num_inference_steps,
                             generator=generator,
-                            guidance_scale=7.5,
-                            controlnet_conditioning_scale=1.0,
+                            guidance_scale=12.0,
+                            control_guidance_end=0.5,
+                            controlnet_conditioning_scale=0.5,
+                            strength=0.99,
                             width=gen_width,
                             height=gen_height,
                         ).images[0]
@@ -642,13 +704,15 @@ def generate_frame_sd15(
                     result_left = pipe(
                         prompt=prompt,
                         negative_prompt=negative_prompt,
-                        image=gen_canvas.convert("RGB"),
+                        image=gen_image_bg_left,
                         mask_image=gen_left_mask,
                         control_image=gen_left_control,
                         num_inference_steps=num_inference_steps,
                         generator=generator,
-                        guidance_scale=7.5,
-                        controlnet_conditioning_scale=1.0,
+                        guidance_scale=12.0,
+                        control_guidance_end=0.5,
+                        controlnet_conditioning_scale=0.5,
+                        strength=0.99,
                         width=gen_width,
                         height=gen_height,
                     ).images[0]
@@ -799,6 +863,33 @@ def generate_frame_sd15(
             print("[dim]Applied seam blending[/dim]")
         except Exception as e:
             print(f"[dim]Seam blending skipped: {e}[/dim]")
+
+    # Make interior transparent (where gray background is still visible)
+    print("[cyan]Making interior transparent...[/cyan]")
+    try:
+        # Convert to numpy for processing
+        frame_array = np.array(final_frame)
+
+        # Find pixels that are close to gray (128, 128, 128) - these are un-generated areas
+        # Calculate distance from gray for each pixel
+        gray_target = np.array([128, 128, 128])
+        rgb = frame_array[:, :, :3].astype(float)
+        diff = np.abs(rgb - gray_target)
+        dist_from_gray = np.mean(diff, axis=2)  # Average distance across RGB channels
+
+        # Pixels very close to gray (threshold: 30) should be made transparent
+        # This represents areas the AI didn't fill with frame details
+        is_interior = dist_from_gray < 30
+
+        # Set alpha to 0 for interior pixels
+        frame_array[:, :, 3] = np.where(is_interior, 0, frame_array[:, :, 3])
+
+        # Convert back to image
+        final_frame = Image.fromarray(frame_array)
+        print("[dim]Interior made transparent[/dim]")
+    except Exception as e:
+        print(f"[yellow]Warning: Could not make interior transparent: {e}[/yellow]")
+        print("[dim]Continuing with full frame...[/dim]")
 
     # Save output
     if output_path is None:
