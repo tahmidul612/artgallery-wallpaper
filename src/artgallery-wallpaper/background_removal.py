@@ -7,20 +7,40 @@ from white, gray, or black backgrounds.
 """
 
 from pathlib import Path
-from typing import Optional, List
+from typing import List
+from typing_extensions import Annotated
 import cv2
 import numpy as np
+import typer
 from rich.progress import Progress, SpinnerColumn, TextColumn
 from rich import print
 
+app = typer.Typer(help="Background removal utilities using HSV color space masking.")
 
+
+@app.command()
 def remove_background(
-    image_path: str,
-    saturation_threshold: int = 40,
-    open_kernel_size: int = 3,
-    close_kernel_size: int = 7,
-    output_path: Optional[str] = None,
-    batch: bool = False,
+    image_path: Annotated[
+        str, typer.Option(help="Path to the input image or directory", prompt=True)
+    ],
+    saturation_threshold: Annotated[
+        int,
+        typer.Option(help="Max saturation for a pixel to be considered background"),
+    ] = 40,
+    open_kernel_size: Annotated[
+        int,
+        typer.Option(help="Kernel size for morphological opening to remove noise"),
+    ] = 3,
+    close_kernel_size: Annotated[
+        int,
+        typer.Option(help="Kernel size for morphological closing to fill holes"),
+    ] = 7,
+    output_path: Annotated[
+        str, typer.Option(help="Path to save the output file or directory")
+    ] = None,
+    batch: Annotated[
+        bool, typer.Option(help="Whether to process images in batch mode")
+    ] = False,
 ) -> List[Path]:
     """Removes a grayscale background using HSV color space masking.
 
@@ -155,3 +175,7 @@ def remove_background(
             print(f"  • {f}")
 
     return processed_files
+
+
+if __name__ == "__main__":
+    app()
