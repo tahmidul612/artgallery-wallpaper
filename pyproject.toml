@@ -1,6 +1,6 @@
 [project]
 name = "artgallery-wallpaper"
-version = "0.0.1"
+version = "0.1.0"
 description = "A python application that generates framed wallpapers from artwork"
 readme = "README.md"
 requires-python = ">=3.9,<3.12"
@@ -123,7 +123,7 @@ docstring-code-line-length = "dynamic"
 
 [tool.commitizen]
 name = "cz_conventional_commits"
-tag_format = "$version"
+tag_format = "v$major.$minor.$patch$prerelease"
 version_scheme = "semver2"
 version_provider = "uv"
 update_changelog_on_bump = true
