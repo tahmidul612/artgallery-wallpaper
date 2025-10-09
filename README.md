@@ -8,7 +8,7 @@ I wanted to recreate the look of framed artwork in a gallery on my computer desk
 
 ### Background Removal
 
-This tool includes a powerful feature for removing plain, grayscale backgrounds (like white, gray, or black) from images. It's particularly useful for isolating subjects like paintings, frame corners, or other objects from their unicolor backdrops. The script uses color-space masking to intelligently separate the colorful foreground from the less saturated background, making it effective even with subtle shadows and gradients.
+This tool includes a powerful feature for removing plain, grayscale backgrounds (like white, gray, or black) from images. It's particularly useful for isolating subjects like paintings, frame corners, or other objects from their solid-colored backdrops. The script uses color-space masking to intelligently separate the colorful foreground from the less saturated background, making it effective even with subtle shadows and gradients.
 
 #### Before and After
 
