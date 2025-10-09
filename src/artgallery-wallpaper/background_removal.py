@@ -83,9 +83,13 @@ def remove_background(
 
         print(f"[cyan]Found {len(image_files)} images to process[/cyan]")
     else:
-        if not image_path.exists():
-            raise FileNotFoundError(f"Image file not found: {image_path}")
-        image_files = [image_path]
+        try:
+            if not image_path.exists():
+                raise FileNotFoundError(f"Image file/folder not found: {image_path}")
+            image_files = [image_path]
+        except FileNotFoundError as e:
+            print(f"[red]{e}[/red]")
+            return []
 
     with Progress(
         SpinnerColumn(),
