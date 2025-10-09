@@ -1,7 +1,18 @@
 {
     "cSpell.words": [
+        "artgallery",
+        "autocast",
         "bgra",
+        "controlnet",
+        "fromarray",
         "imread",
-        "imwrite"
+        "imwrite",
+        "Inpaint",
+        "inpainting",
+        "lllyasviel",
+        "runwayml",
+        "sentencepiece",
+        "torchvision",
+        "xformers"
     ]
 }
